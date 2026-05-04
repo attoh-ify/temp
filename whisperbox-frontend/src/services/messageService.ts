@@ -1,7 +1,4 @@
-import {
-  unwrapMessageKey,
-  decryptMessage,
-} from "@/src/crypto/messageDecrypt";
+import { unwrapMessageKey, decryptMessage } from "@/src/crypto/messageDecrypt";
 
 export async function decryptIncomingMessage({
   message,
@@ -10,23 +7,17 @@ export async function decryptIncomingMessage({
   message: any;
   privateKey: CryptoKey;
 }) {
-  // 1. pick correct key
   const encryptedKey = message.payload.encryptedKey;
-
-  // 2. unwrap AES key
   const aesKey = await unwrapMessageKey(encryptedKey, privateKey);
-
-  // 3. decrypt message
   const text = await decryptMessage(
     message.payload.ciphertext,
     message.payload.iv,
     aesKey
   );
 
+  // Spread the full message so from_user_id, to_user_id etc. are preserved
   return {
-    id: message.id,
-    from: message.from_user_id,
+    ...message,
     text,
-    created_at: message.created_at,
   };
 }

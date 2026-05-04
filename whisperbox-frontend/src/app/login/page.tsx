@@ -19,6 +19,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       setError(null);
+      console.log({ username: username.trim(), password })
 
       const res = await apiFetch("/auth/login", {
         method: "POST",
@@ -32,7 +33,7 @@ export default function LoginPage() {
       const privateKey = await unwrapPrivateKey(user.wrapped_private_key, wrappingKey);
 
       setSession({ access_token, refresh_token, user });
-      setPrivateKey(privateKey);
+      await setPrivateKey(privateKey); // ← now async; must await
 
       router.push("/chat");
     } catch (err: any) {
@@ -45,7 +46,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0f1117] text-white p-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center mb-3">
             <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="text-indigo-400">
@@ -68,7 +68,6 @@ export default function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleLogin(); }}
             />
-
             <input
               placeholder="Password"
               type="password"

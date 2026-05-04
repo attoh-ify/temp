@@ -10,8 +10,8 @@ export function useConversations() {
     try {
       const data = await apiFetch("/conversations");
       setConversations(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Failed to load conversations:", err);
+    } catch {
+      // Silently fail — conversations are best-effort; sidebar just stays empty
       setConversations([]);
     } finally {
       setLoading(false);

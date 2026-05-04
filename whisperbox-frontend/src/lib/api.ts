@@ -1,17 +1,16 @@
-import { clearSession, getToken } from "../auth/session";
+import { getToken } from "../auth/session";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://whisperbox.koyeb.app";
-
+/**
+ * All backend calls go through Next.js API routes to avoid CORS.
+ * Maps e.g. /conversations  →  /api/conversations
+ *           /auth/login     →  /api/auth/login
+ */
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = getToken();
-  console.log("TOKEN:", token);
 
-  const isInternal = endpoint.startsWith("/api/");
-
-  const url = isInternal
-    ? endpoint
-    : `${BASE_URL}${endpoint}`;
+  // Already an internal path (/api/...) → use as-is
+  // External path → prepend /api
+  const url = endpoint.startsWith("/api/") ? endpoint : `/api${endpoint}`;
 
   const res = await fetch(url, {
     ...options,
@@ -23,8 +22,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   });
 
   const text = await res.text();
-
-  let data;
+  let data: any;
   try {
     data = JSON.parse(text);
   } catch {
